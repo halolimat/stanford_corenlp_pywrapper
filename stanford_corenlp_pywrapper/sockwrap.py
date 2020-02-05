@@ -74,7 +74,7 @@ def command(mode=None, configfile=None, configdict=None, comm_mode=None,
     else: assert False, "need comm_mode to be SOCKET or PIPE but got " + repr(comm_mode)
 
 
-    cmd = """exec {java_command} {java_options} -cp '{classpath}' 
+    cmd = """exec {java_command} {java_options} -cp '{classpath}'
     corenlp.SocketServer {comm_info} {more_config}"""
     return cmd.format(**d).replace("\n", " ")
 
@@ -85,7 +85,7 @@ class SubprocessCrashed(Exception):
 
 class CoreNLP:
 
-    def __init__(self, mode=None, 
+    def __init__(self, mode=None,
             configfile=None, configdict=None,
             corenlp_jars=(
                 "/home/sw/corenlp/stanford-corenlp-full-2015-04-20/*",
@@ -168,7 +168,7 @@ class CoreNLP:
         if self.comm_mode=='PIPE':
             if not os.path.exists(self.outpipe):
                 os.mkfifo(self.outpipe)
-        
+
         cmd = command(**self.__dict__)
         LOG.info("Starting java subprocess, and waiting for signal it's ready, with command: %s" % cmd)
         self.proc = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE)
@@ -191,7 +191,7 @@ class CoreNLP:
                 assert ret == "PONG", "Bad return data on startup ping: " + ret
                 LOG.info("Successful ping. The server has started.")
                 break
-            except socket.error, e:
+            except socket.error as e:
                 LOG.info("Waiting for startup: ping got exception: %s %s" % (type(e), e))
                 LOG.info("pausing before retry")
                 time.sleep(STARTUP_BUSY_WAIT_INTERVAL_SEC)
@@ -251,7 +251,7 @@ class CoreNLP:
                 LOG.warning("Bad JSON length %d, starts with: %s" % (len(data), repr(data[:1000])))
                 return None
             return decoded
-        except socket.timeout, e:
+        except socket.timeout as e:
             LOG.info("Socket timeout happened, returning None: %s %s" % (type(e), e))
             return None
             # This is tricky. maybe the process is running smoothly but just
@@ -329,7 +329,7 @@ def test_paths():
 def assert_no_java(msg=""):
     ps_output = os.popen("ps wux").readlines()
     javalines = [x for x in ps_output if re.search(r'\bbin/java\b', x)]
-    print ''.join(javalines)
+    print (''.join(javalines))
     assert len(javalines) == 0, msg
 
 # def test_doctimeout():
@@ -345,8 +345,8 @@ if __name__=='__main__':
     import sys
     if sys.argv[1]=='modes':
         for mode,d in MODES_items:
-            print "  * `%s`: %s" % (mode, d['description'])
+            print ("  * `%s`: %s" % (mode, d['description']))
     if sys.argv[1]=='modes_json':
         # import json as stdjson
         # print stdjson.dumps(MODES, indent=4)
-        print '"%s"' % json.dumps(MODES).replace('"', r'\"')
+        print ('"%s"' % json.dumps(MODES).replace('"', r'\"'))
