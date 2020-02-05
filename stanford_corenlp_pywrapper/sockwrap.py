@@ -266,13 +266,13 @@ class CoreNLP:
             sock.sendall(cmd + "\n")
             size_info_str = sock.recv(8)
         elif self.comm_mode == 'PIPE':
-            self.proc.stdin.write(cmd + "\n")
+            self.proc.stdin.write((cmd+"\n").encode('utf-8'))
             self.proc.stdin.flush()
             size_info_str = self.outpipe_fp.read(8)
 
         # java "long" is 8 bytes, which python struct calls "long long".
         # java default byte ordering is big-endian.
-        size_info = struct.unpack('>Q', size_info_str)[0]
+        size_info = struct.unpack(('>Q').encode('utf-8'), (size_info_str).encode('utf-8'))[0]
         # print "size expected", size_info
 
         chunks = []
