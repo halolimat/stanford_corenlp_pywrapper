@@ -178,7 +178,7 @@ class CoreNLP:
             sock = self.get_socket(num_retries=100, retry_interval=STARTUP_BUSY_WAIT_INTERVAL_SEC)
             sock.close()
         elif self.comm_mode=='PIPE':
-            self.outpipe_fp = open(self.outpipe, 'r')
+            self.outpipe_fp = open(self.outpipe, 'rb')
 
         while True:
             # This loop is for if you have timeouts for the socket connection
@@ -272,8 +272,7 @@ class CoreNLP:
 
         # java "long" is 8 bytes, which python struct calls "long long".
         # java default byte ordering is big-endian.
-        size_info = struct.unpack(('>Q').encode('utf-8'), (size_info_str).encode('utf-8'))[0]
-        # print "size expected", size_info
+        size_info = struct.unpack(('>Q').encode('utf-8'), size_info_str)[0]
 
         chunks = []
         curlen = lambda: sum(len(x) for x in chunks)
@@ -283,7 +282,7 @@ class CoreNLP:
                 data = sock.recv(remaining_size)
             elif self.comm_mode == 'PIPE':
                 data = self.outpipe_fp.read(remaining_size)
-            chunks.append(data)
+            chunks.append(data.decode("utf-8"))
             if curlen() >= size_info: break
             if len(chunks) > 1000:
                 LOG.warning("Incomplete value from server")
