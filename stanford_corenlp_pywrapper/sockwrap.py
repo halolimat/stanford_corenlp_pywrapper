@@ -43,7 +43,7 @@ STARTUP_BUSY_WAIT_INTERVAL_SEC = 1.0
 
 def command(mode=None, configfile=None, configdict=None, comm_mode=None,
         java_command="java",
-        java_options="-Xmx4g -XX:ParallelGCThreads=1",
+        java_options="-Xmx4g -XX:ParallelGCThreads=12",
         **kwargs):
     d = {}
     d.update(**locals())
@@ -62,6 +62,9 @@ def command(mode=None, configfile=None, configdict=None, comm_mode=None,
     if configfile:
         more_config += " --configfile {}".format(configfile)
     if configdict:
+        # NOTE: the gold data from BioScope was already tokenized, so here I am
+        #       using whitespace tokenizer to avoid the overhead of using another one.
+        configdict.update({'tokenize.language': 'Whitespace'})
         j = json.dumps(configdict)
         assert "'" not in j, "can't handle single quote in config values"
         more_config += " --configdict '{}'".format(j)
